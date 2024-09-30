@@ -46,13 +46,17 @@ def modelo_identificado(k, tau, theta):
 resposta_modelo = modelo_identificado(k, tau, theta)
 
 # 7. Simular a resposta ao degrau do modelo identificado
-t_sim, y_modelo = ctrl.step_response(resposta_modelo, T=tempo)
+t_sim, y_modelo = ctrl.step_response(resposta_modelo*amplitude_degrau, T=tempo)
 
-# 8. Visualização dos Resultados
+# 8. Cálculo do Erro Quadrático Médio (EQM)
+EQM = np.sqrt(np.sum((y_modelo - saida) ** 2) / len(saida))
+
+# 9. Visualização dos Resultados
 plt.figure(figsize=(12, 6))
 plt.plot(tempo, saida, 'orange', label='Resposta Real do Sistema')
+plt.plot(tempo, entrada, label='Entrada (Degrau)', color='blue')
 plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Smith)')
-plt.title('Identificação da Planta pelo Método de Smith')
+plt.title('Identificação da Planta pelo Método de Smith' f'\n(EQM): {EQM:.4f}')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
@@ -66,4 +70,5 @@ print(f'Parâmetros Identificados:')
 print(f'Ganho (k): {k:.4f}')
 print(f'Tempo de Atraso (θ): {theta:.4f} s')
 print(f'Constante de Tempo (τ): {tau:.4f} s')
+print(f'Erro Quadrático Médio (EQM): {EQM}')
 
