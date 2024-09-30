@@ -28,18 +28,17 @@ tau = 1.5 * (t2 - t1)
 theta = t2 - tau
 
 # 4. Calcular o ganho k
-amplitude_degrau = entrada.max() - entrada.min()  # Amplitude do degrau de entrada
+amplitude_degrau = entrada.mean()  # Amplitude do degrau de entrada
 k = (valor_final - saida[0]) / amplitude_degrau
-#k = (y2 - y1) / (t2 - t1)
 
 # 5. Modelo Identificado usando a Função de Transferência
 # Modelo: G(s) = k * exp(-theta*s) / (tau * s + 1)
 def modelo_identificado(k, tau, theta):
     # Função de transferência do sistema de primeira ordem: G(s) = k / (tau * s + 1)
-    G_s = ctrl.TransferFunction([k], [tau, 1])
+    G_s = ctrl.tf([k], [tau, 1])
     # Aproximação de Pade para o atraso
     num_pade, den_pade = ctrl.pade(theta, 1)  # Aproximação de ordem 1
-    Pade_approx = ctrl.TransferFunction(num_pade, den_pade)
+    Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
     return G_s * Pade_approx
 
