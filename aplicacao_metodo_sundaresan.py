@@ -37,7 +37,7 @@ def modelo_identificado(k, tau, theta):
     # Função de transferência do sistema de primeira ordem: G(s) = k / (tau * s + 1)
     G_s = ctrl.tf([k], [tau, 1])
     # Aproximação de Pade para o atraso
-    num_pade, den_pade = ctrl.pade(theta, 1)  # Aproximação de ordem 1
+    num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
     return G_s * Pade_approx
