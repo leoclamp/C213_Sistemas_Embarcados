@@ -15,17 +15,17 @@ tempo = data['TARGET_DATA____ProjetoC213_Degrau'][0]  # A primeira linha é o te
 # 1. Determinar o valor final da saída
 valor_final = saida[-1]
 
-# 2. Encontrar os tempos correspondentes a 28,3% e 63,2% do valor final
-y1 = 0.283 * valor_final
-y2 = 0.632 * valor_final
+# 2. Encontrar os tempos correspondentes a 35,3% e 85,3% do valor final
+y1 = 0.353 * valor_final
+y2 = 0.853 * valor_final
 
 # Encontrar t1 e t2 nos dados
 t1 = tempo[np.where(saida >= y1)[0][0]]
 t2 = tempo[np.where(saida >= y2)[0][0]]
 
-# 3. Calcular τ e θ usando o Método de Smith
-tau = 1.5 * (t2 - t1)
-theta = t2 - tau
+# 3. Calcular τ e θ usando o Método de Sundaresan
+tau = (2/3) * (t2 - t1)
+theta = (1.3*t1) - (0.29*t2)
 
 # 4. Calcular o ganho k
 amplitude_degrau = entrada.mean()  # Amplitude do degrau de entrada
@@ -37,7 +37,7 @@ def modelo_identificado(k, tau, theta):
     # Função de transferência do sistema de primeira ordem: G(s) = k / (tau * s + 1)
     G_s = ctrl.tf([k], [tau, 1])
     # Aproximação de Pade para o atraso
-    num_pade, den_pade = ctrl.pade(theta, 1)  # Aproximação de ordem 1
+    num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
     return G_s * Pade_approx
@@ -55,8 +55,8 @@ EQM = np.sqrt(np.sum((y_modelo - saida) ** 2) / len(saida))
 plt.figure(figsize=(12, 6))
 plt.plot(tempo, saida, 'orange', label='Resposta Real do Sistema')
 plt.plot(tempo, entrada, label='Entrada (Degrau)', color='blue')
-plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Smith)')
-plt.title('Identificação da Planta pelo Método de Smith')
+plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Sundaresan) Malha Aberta')
+plt.title('Identificação da Planta pelo Método de Sundaresan (Malha Aberta)')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
@@ -78,7 +78,7 @@ plt.text(tempo[-1] * 0.77, max(saida) * 0.7, textstr, fontsize=10, bbox=props)
 plt.show()
 
 # Exibir os resultados
-print(f'Método de Identificação: Smith')
+print(f'Método de Identificação: Sundaresan (Malha Aberta)')
 print(f'Parâmetros Identificados:')
 print(f'Ganho (k): {k:.4f}')
 print(f'Tempo de Atraso (θ): {theta:.4f} s')

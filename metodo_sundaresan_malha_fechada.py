@@ -36,11 +36,12 @@ k = (valor_final - saida[0]) / amplitude_degrau
 def modelo_identificado(k, tau, theta):
     # Função de transferência do sistema de primeira ordem: G(s) = k / (tau * s + 1)
     G_s = ctrl.tf([k], [tau, 1])
+    H_s = ctrl.feedback(G_s, 1)
     # Aproximação de Pade para o atraso
-    num_pade, den_pade = ctrl.pade(theta, 1)  # Aproximação de ordem 1
+    num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
-    return G_s * Pade_approx
+    return H_s * Pade_approx
 
 # 6. Calcular a resposta estimada usando o modelo
 resposta_modelo = modelo_identificado(k, tau, theta)
@@ -49,14 +50,14 @@ resposta_modelo = modelo_identificado(k, tau, theta)
 t_sim, y_modelo = ctrl.step_response(resposta_modelo*amplitude_degrau, T=tempo)
 
 # 8. Cálculo do Erro Quadrático Médio (EQM)
-EQM = np.sqrt(np.sum((y_modelo - saida) ** 2) / len(saida))
+EQM = np.sqrt(np.sum((y_modelo - entrada) ** 2) / len(entrada))
 
 # 9. Visualização dos Resultados
 plt.figure(figsize=(12, 6))
 plt.plot(tempo, saida, 'orange', label='Resposta Real do Sistema')
 plt.plot(tempo, entrada, label='Entrada (Degrau)', color='blue')
-plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Sundaresan)')
-plt.title('Identificação da Planta pelo Método de Sundaresan')
+plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Sundaresan) Malha Fechada')
+plt.title('Identificação da Planta pelo Método de Sundaresan (Malha Fechada)')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
@@ -78,7 +79,7 @@ plt.text(tempo[-1] * 0.77, max(saida) * 0.7, textstr, fontsize=10, bbox=props)
 plt.show()
 
 # Exibir os resultados
-print(f'Método de Identificação: Sundaresan')
+print(f'Método de Identificação: Sundaresan (Malha Fechada)')
 print(f'Parâmetros Identificados:')
 print(f'Ganho (k): {k:.4f}')
 print(f'Tempo de Atraso (θ): {theta:.4f} s')
