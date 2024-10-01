@@ -56,12 +56,25 @@ plt.figure(figsize=(12, 6))
 plt.plot(tempo, saida, 'orange', label='Resposta Real do Sistema')
 plt.plot(tempo, entrada, label='Entrada (Degrau)', color='blue')
 plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Smith)')
-plt.title('Identificação da Planta pelo Método de Smith' f'\n(EQM): {EQM:.4f}')
+plt.title('Identificação da Planta pelo Método de Smith')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
 plt.grid()
 plt.tight_layout()
+
+# Adicionando os parâmetros identificados no gráfico em uma caixa delimitada
+props = dict(boxstyle='round', facecolor='white', alpha=0.6)  # Estilo da caixa
+
+textstr = '\n'.join((
+    f'Ganho (k): {k:.4f}',
+    f'Tempo de Atraso (θ): {theta:.4f} s',
+    f'Constante de Tempo (τ): {tau:.4f} s',
+    f'(EQM): {EQM:.4f}'))
+
+# Posicionar a caixa com os resultados no gráfico
+plt.text(tempo[-1] * 0.77, max(saida) * 0.7, textstr, fontsize=10, bbox=props)
+
 plt.show()
 
 # Exibir os resultados
