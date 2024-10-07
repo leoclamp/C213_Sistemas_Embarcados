@@ -1,18 +1,9 @@
 # Projeto Prático de Sistemas Embarcados
 
-A imagem abaixo apresenta o gráfico da identificação da função de transferência utilizando o Método de Smith em malha aberta.
+A imagem abaixo apresenta a resposta ao degrau obtida pela identificação pelos métodos de Smith e Sundaresan, juntamente com suas respectivas funções de transferência.
 
 ![metodo_smith](./imagens/metodo_smith_malha_aberta.png)
 
-A imagem abaixo apresenta o gráfico da identificação da função de transferência utilizando o Método de Smith em malha fechada.
-
-![metodo_smith](./imagens/metodo_smith_malha_fechada.png)
-
-A imagem abaixo apresenta o gráfico da identificação da função de transferência utilizando o Método de Sundaresan em malha aberta.
-
 ![metodo_sundaresan](./imagens/metodo_sundaresan_malha_aberta.png)
 
-A imagem abaixo apresenta o gráfico da identificação da função de transferência utilizando o Método de Sundaresan em malha fechada.
-
-![metodo_sundaresan](./imagens/metodo_sundaresan_malha_fechada.png)
-
+![funções de transferência](./imagens/função_transferência_smith_e_sundaresan.png)

@@ -40,7 +40,7 @@ def modelo_identificado(k, tau, theta):
     num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
-    return G_s * Pade_approx
+    return ctrl.series(G_s, Pade_approx)
 
 # 6. Calcular a resposta estimada usando o modelo
 resposta_modelo = modelo_identificado(k, tau, theta)
@@ -83,5 +83,11 @@ print(f'Parâmetros Identificados:')
 print(f'Ganho (k): {k:.4f}')
 print(f'Tempo de Atraso (θ): {theta:.4f} s')
 print(f'Constante de Tempo (τ): {tau:.4f} s')
+print(f'Função de Transferência do Modelo Identificado: G(s) = {k:.4f} * e^(-{theta:.4f} * s) / ({tau:.4f} * s + 1)')
 print(f'Erro Quadrático Médio (EQM): {EQM}')
+
+info = ctrl.step_info(resposta_modelo)
+# Exibir o tempo de subida e o tempo de acomodação
+print(f"Tempo de subida: {info['RiseTime']:.4f} s")
+print(f"Tempo de acomodação: {info['SettlingTime']:.4f} s")
 
