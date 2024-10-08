@@ -31,10 +31,8 @@ theta = t2 - tau
 amplitude_degrau = entrada.mean()  # Amplitude do degrau de entrada
 k = (valor_final - saida[0]) / amplitude_degrau
 
-# 5. Modelo Identificado usando a Função de Transferência
-# Modelo: G(s) = k * exp(-theta*s) / (tau * s + 1)
+# 5. função de tranferencia do modelo
 def modelo_identificado(k, tau, theta):
-    # Função de transferência do sistema de primeira ordem: G(s) = k / (tau * s + 1)
     G_s = ctrl.tf([k], [tau, 1])
     H_s = ctrl.feedback(G_s, 1)
     # Aproximação de Pade para o atraso
@@ -46,48 +44,54 @@ def modelo_identificado(k, tau, theta):
 # 6. Calcular a resposta estimada usando o modelo
 resposta_modelo = modelo_identificado(k, tau, theta)
 
-# 7. Simular a resposta ao degrau do modelo identificado
-t_sim, y_modelo = ctrl.step_response(resposta_modelo*amplitude_degrau, T=tempo)
+# Calculando os valores de kp, ti e td
+lamb = 20 # lambda tem que ser maior que 10.2 (lamb/theta > 0.8)
+kp = ((2*tau)+theta)/(k*((2*lamb)+theta))
+ti = tau+(theta/2)
+td = (tau*theta)/((2*tau)+theta)
 
-# 8. Cálculo do Erro Quadrático Médio (EQM)
-EQM = np.sqrt(np.sum((y_modelo - entrada) ** 2) / len(entrada))
+# 7. função do PID
+def funcao_PID(kp, ti, td):
+    pid = ctrl.tf([kp*td, kp, kp/ti], [1, 0])
+    return pid
+
+PID = funcao_PID(kp, ti, td)
+
+# Sistema em malha fechada com controlador PID e modelo identificado
+sistema_em_malha_fechada = ctrl.feedback(ctrl.series(PID, resposta_modelo))
+
+# Simulação da resposta ao degrau
+t_sim, y_modelo = ctrl.step_response(sistema_em_malha_fechada)
 
 # 9. Visualização dos Resultados
 plt.figure(figsize=(12, 6))
-plt.plot(tempo, saida, 'orange', label='Resposta Real do Sistema')
-plt.plot(tempo, entrada, label='Entrada (Degrau)', color='blue')
-plt.plot(t_sim, y_modelo, 'r--', label='Modelo Identificado (Smith) Malha Fechada')
-plt.title('Identificação da Planta pelo Método de Smith (Malha Fechada)')
+plt.plot(t_sim, y_modelo, 'orange', label='PID')
+plt.title('Sistema com controle PID\n Sistema lento, sem overshoot (ts elevado)')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
 plt.grid()
 plt.tight_layout()
 
+info = ctrl.step_info(sistema_em_malha_fechada)
+
 # Adicionando os parâmetros identificados no gráfico em uma caixa delimitada
 props = dict(boxstyle='round', facecolor='white', alpha=0.6)  # Estilo da caixa
 
 textstr = '\n'.join((
-    f'Ganho (k): {k:.4f}',
-    f'Tempo de Atraso (θ): {theta:.4f} s',
-    f'Constante de Tempo (τ): {tau:.4f} s',
-    f'(EQM): {EQM:.4f}'))
+    f'Tempo de subida(tr): {info['RiseTime']:.4f} s',
+    f'Tempo de acomodação(ts): {info['SettlingTime']:.4f} s'))
 
 # Posicionar a caixa com os resultados no gráfico
-plt.text(tempo[-1] * 0.77, max(saida) * 0.7, textstr, fontsize=10, bbox=props)
+plt.text(tempo[-1] * 6, 0.7, textstr, fontsize=10, bbox=props)
 
 plt.show()
 
 # Exibir os resultados
-print(f'Método de Identificação: Smith (Malha Fechada)')
-print(f'Parâmetros Identificados:')
-print(f'Ganho (k): {k:.4f}')
-print(f'Tempo de Atraso (θ): {theta:.4f} s')
-print(f'Constante de Tempo (τ): {tau:.4f} s')
-print(f'Erro Quadrático Médio (EQM): {EQM}')
+print(f'Sistema com controle PID')
+print(f'respostas:')
 
-info = ctrl.step_info(resposta_modelo)
-# Exibir o tempo de subida e o tempo de acomodação
+info = ctrl.step_info(sistema_em_malha_fechada)
 print(f"Tempo de subida(tr): {info['RiseTime']:.4f} s")
 print(f"Tempo de acomodação(ts): {info['SettlingTime']:.4f} s")
 print(f"valor de pico: {info['Peak']:.4f}")
