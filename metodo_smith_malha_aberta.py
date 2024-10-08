@@ -88,6 +88,7 @@ print(f'Erro Quadrático Médio (EQM): {EQM}')
 
 info = ctrl.step_info(resposta_modelo)
 # Exibir o tempo de subida e o tempo de acomodação
-print(f"Tempo de subida: {info['RiseTime']:.4f} s")
-print(f"Tempo de acomodação: {info['SettlingTime']:.4f} s")
+print(f"Tempo de subida(tr): {info['RiseTime']:.4f} s")
+print(f"Tempo de acomodação(ts): {info['SettlingTime']:.4f} s")
+print(f"valor de pico: {info['Peak']:.4f}")
 
