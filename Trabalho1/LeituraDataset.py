@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import scipy.io as sio
 
 # Carregar o dataset
-file_path = 'Dataset_Grupo3.mat'  # Altere o nome do arquivo conforme necessário
+file_path = 'Dataset_Grupo3.mat'  # nome do dataset
 data = sio.loadmat(file_path)
 
 # Exibir as chaves para entender a estrutura do dataset
