@@ -69,7 +69,7 @@ info_fechada = ctrl.step_info(resposta_malha_fechada)
 plt.figure(figsize=(12, 6))
 plt.plot(t_sim_aberta, y_modelo_aberta, 'r', label='Modelo Identificado (Smith) Malha Aberta')
 plt.plot(t_sim_fechada, y_modelo_fechada, 'b', label='Modelo Identificado (Smith) Malha Fechada')
-plt.title('Comparacao entre Malha Aberta e Fechada')
+plt.title('Comparação entre Malha Aberta e Fechada')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
@@ -109,8 +109,4 @@ if info_aberta['Peak'] > info_fechada['Peak']:
     print('  - O sistema em malha aberta tem maior valor final(pico).')
 else:
     print('  - O sistema em malha fechada tem maior valor final(pico).')
-
-# Resultados dos Erros Quadráticos Médios
-print(f'\nErro Quadrático Médio (EQM) para Malha Aberta: {EQM_aberta:.4f}')
-print(f'Erro Quadrático Médio (EQM) para Malha Fechada: {EQM_fechada:.4f}')
 
