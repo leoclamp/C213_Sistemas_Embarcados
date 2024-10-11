@@ -34,12 +34,11 @@ k = (valor_final - saida[0]) / amplitude_degrau
 # 5. função de tranferencia do modelo
 def modelo_identificado(k, tau, theta):
     G_s = ctrl.tf([k], [tau, 1])
-    H_s = ctrl.feedback(G_s, 1)
     # Aproximação de Pade para o atraso
     num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
-    return ctrl.series(H_s, Pade_approx)
+    return ctrl.series(G_s, Pade_approx)
 
 # 6. Calcular a resposta estimada usando o modelo
 resposta_modelo = modelo_identificado(k, tau, theta)
@@ -48,6 +47,7 @@ resposta_modelo = modelo_identificado(k, tau, theta)
 kp = (0.6*tau)/(k*theta)
 ti = tau
 td = theta/2
+setpoint = amplitude_degrau
 
 # 7. função do PID
 def funcao_PID(kp, ti, td):
@@ -60,30 +60,25 @@ PID = funcao_PID(kp, ti, td)
 sistema_em_malha_fechada = ctrl.feedback(ctrl.series(PID, resposta_modelo))
 
 # Simulação da resposta ao degrau
-t_sim, y_modelo = ctrl.step_response(sistema_em_malha_fechada)
+t_sim, y_modelo = ctrl.step_response(sistema_em_malha_fechada*setpoint)
+
+info = ctrl.step_info(sistema_em_malha_fechada)
+t_subida = info['RiseTime']
+t_acomodacao = info['SettlingTime']
 
 # 9. Visualização dos Resultados
 plt.figure(figsize=(12, 6))
 plt.plot(t_sim, y_modelo, 'orange', label='PID')
+plt.axvline(t_subida, color='green', linestyle='--', label='Tempo de Subida')
+plt.axvline(t_acomodacao, color='purple', linestyle='--', label='Tempo de Acomodação')
+plt.text(t_subida, 0.9 * setpoint, f'Tempo de Subida: {t_subida:.2f}s', color='green', fontsize=10)
+plt.text(t_acomodacao, 0.8 * setpoint, f'Tempo de Acomodação: {t_acomodacao:.2f}s', color='purple', fontsize=10)
 plt.title('Sistema com controle PID\n Sistema lento, sem overshoot')
 plt.xlabel('Tempo (s)')
 plt.ylabel('Potência do Motor')
 plt.legend()
 plt.grid()
 plt.tight_layout()
-
-info = ctrl.step_info(sistema_em_malha_fechada)
-
-# Adicionando os parâmetros identificados no gráfico em uma caixa delimitada
-props = dict(boxstyle='round', facecolor='white', alpha=0.6)  # Estilo da caixa
-
-textstr = '\n'.join((
-    f'Tempo de subida(tr): {info['RiseTime']:.4f} s',
-    f'Tempo de acomodação(ts): {info['SettlingTime']:.4f} s'))
-
-# Posicionar a caixa com os resultados no gráfico
-plt.text(tempo[-1] * 4, 0.7, textstr, fontsize=10, bbox=props)
-
 plt.show()
 
 # Exibir os resultados
