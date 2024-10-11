@@ -36,16 +36,14 @@ k = (valor_final - saida[0]) / amplitude_degrau
 # 5. função de tranferencia do modelo
 def modelo_identificado(k, tau, theta):
     G_s = ctrl.tf([k], [tau, 1])
-    H_s = ctrl.feedback(G_s, 1)
     # Aproximação de Pade para o atraso
     num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
-    return ctrl.series(H_s, Pade_approx)
+    return ctrl.series(G_s, Pade_approx)
 
 # 6. Calcular a resposta estimada usando o modelo
 resposta_modelo = modelo_identificado(k, tau, theta)
-
 
 # Função para atualizar o PID com os parâmetros definidos pelo usuário
 def atualizar_PID():
@@ -63,11 +61,19 @@ def atualizar_PID():
 
     # Simular resposta ao degrau considerando o setpoint fornecido
     t_sim, y_modelo = ctrl.step_response(sistema_em_malha_fechada * setpoint)
+    
+    info = ctrl.step_info(sistema_em_malha_fechada)
+    t_subida = info['RiseTime']
+    t_acomodacao = info['SettlingTime']
 
     # Plotar a resposta
     plt.figure(figsize=(12, 6))
     plt.plot(t_sim, y_modelo, 'orange', label='Resposta do sistema com PID')
     plt.axhline(setpoint, color='blue', linestyle='--', label='Setpoint')
+    plt.axvline(t_subida, color='green', linestyle='--', label='Tempo de Subida')
+    plt.axvline(t_acomodacao, color='purple', linestyle='--', label='Tempo de Acomodação')
+    plt.text(t_subida, 0.9 * setpoint, f'Tempo de Subida: {t_subida:.2f}s', color='green', fontsize=10)
+    plt.text(t_acomodacao, 0.8 * setpoint, f'Tempo de Acomodação: {t_acomodacao:.2f}s', color='purple', fontsize=10)
     plt.title('Resposta do sistema com controle PID')
     plt.xlabel('Tempo (s)')
     plt.ylabel('Potência do Motor')
@@ -79,10 +85,11 @@ def atualizar_PID():
 # Configurar a janela principal
 root = tk.Tk()
 root.title("Controle PID")
+root.geometry("500x200")  # Definindo uma largura maior para o formato paisagem
 
 # Parâmetros PID
 frame_pid = ttk.LabelFrame(root, text="Parâmetros PID", padding=(20, 10))
-frame_pid.grid(row=0, column=0, padx=20, pady=10)
+frame_pid.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
 
 ttk.Label(frame_pid, text="Kp:").grid(row=0, column=0)
 entry_kp = ttk.Entry(frame_pid)
@@ -98,7 +105,7 @@ entry_td.grid(row=2, column=1)
 
 # Parâmetro Setpoint
 frame_setpoint = ttk.LabelFrame(root, text="Setpoint", padding=(20, 10))
-frame_setpoint.grid(row=1, column=0, padx=20, pady=10)
+frame_setpoint.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")  # Mudança na posição para o layout em paisagem
 
 ttk.Label(frame_setpoint, text="Setpoint:").grid(row=0, column=0)
 entry_setpoint = ttk.Entry(frame_setpoint)
@@ -106,7 +113,6 @@ entry_setpoint.grid(row=0, column=1)
 
 # Botão para atualizar o gráfico
 button_update = ttk.Button(root, text="Atualizar Gráfico", command=atualizar_PID)
-button_update.grid(row=2, column=0, pady=20)
+button_update.grid(row=1, column=0, columnspan=2, pady=20)
 
 root.mainloop()
-
