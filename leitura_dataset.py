@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import scipy.io as sio
 
 # Carregar o dataset
-file_path = 'Dataset_Grupo3.mat'  # Altere o nome do arquivo conforme necessário
+file_path = 'Dataset_Grupo3.mat'
 data = sio.loadmat(file_path)
 
 # Exibir as chaves para entender a estrutura do dataset
@@ -19,8 +19,9 @@ plt.plot(tempo, entrada, label='Entrada (Degrau)', color='blue')
 plt.plot(tempo, saida, label='Saída (Potência do Motor)', color='orange')
 plt.title('Entrada e Saída do Sistema')
 plt.xlabel('Tempo (s)')
-plt.ylabel('Valores')
+plt.ylabel('Potência do Motor')
 plt.legend()
 plt.grid()
-plt.tight_layout()  # Ajusta o layout para evitar sobreposição
+plt.tight_layout()
 plt.show()
+

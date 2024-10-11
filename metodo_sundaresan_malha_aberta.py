@@ -4,7 +4,7 @@ import scipy.io as sio
 import control as ctrl
 
 # Carregar o dataset
-file_path = 'Dataset_Grupo3.mat'  # Altere o nome do arquivo conforme necessário
+file_path = 'Dataset_Grupo3.mat'
 data = sio.loadmat(file_path)
 
 # Extraindo entrada, saída e tempo
