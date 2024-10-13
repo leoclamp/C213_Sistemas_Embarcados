@@ -41,7 +41,7 @@ def modelo_identificado(k, tau, theta):
     num_pade, den_pade = ctrl.pade(theta, 5)  # Aproximação de ordem 5
     Pade_approx = ctrl.tf(num_pade, den_pade)
     # Função de transferência com atraso
-    return ctrl.series(G_s, Pade_approx)
+    return ctrl.series(H_s, Pade_approx)
 
 # 6. Calcular a resposta estimada usando o modelo
 resposta_modelo = modelo_identificado(k, tau, theta)
