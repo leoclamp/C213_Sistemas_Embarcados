@@ -44,7 +44,7 @@ def modelo_identificado(k, tau, theta):
 resposta_modelo = modelo_identificado(k, tau, theta)
 
 # Calculando os valores de kp, ti e td
-lamb = 20 # lambda tem que ser maior que 10.2 (lamb/theta > 0.8)
+lamb = 15 # lambda tem que ser maior que 10.2 (lamb/theta > 0.8)
 kp = ((2*tau)+theta)/(k*((2*lamb)+theta))
 ti = tau+(theta/2)
 td = (tau*theta)/((2*tau)+theta)
